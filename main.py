@@ -1,10 +1,9 @@
 from flask import Flask, request
 import pandas as pd
-from flask_cors import CORS
+from flask_cors import cross_origin
 import os
 
 app = Flask(__name__)
-CORS(app)
 
 def get_release_year(df):
     total = len(df["release_year"]) #there is no nan in this column
@@ -40,6 +39,7 @@ def guess_asked(guess, response_json):
     return False
 
 @app.route('/', methods=['POST'])
+@cross_origin()
 def hello_world():
     response_json = request.get_json()
 
