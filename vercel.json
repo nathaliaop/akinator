@@ -12,7 +12,9 @@
    "dest": "main.py",
    "methods": [
     "GET",
-    "POST"
+    "POST",
+    "PUT",
+    "DELETE"
   ]
   }
  ]

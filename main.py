@@ -4,6 +4,7 @@ from flask_cors import CORS
 import os
 
 app = Flask(__name__)
+CORS(app)
 
 def get_release_year(df):
     total = len(df["release_year"]) #there is no nan in this column
