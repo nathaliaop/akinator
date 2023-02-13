@@ -1,6 +1,15 @@
 # Akinator
 Jogo no estilo Akinator para a disciplina de Projeto e Análise de Algoritmos
 
+# Clonar o projeto
+```
+# clonar o repositório
+git clone https://github.com/nathaliaop/akinator.git
+
+# acessar o diretório do projeto
+cd akinator
+```
+
 ## Criar ambiente virtual e instalar dependências:
 ```
 # criar o ambiente virtual 
