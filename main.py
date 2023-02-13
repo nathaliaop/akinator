@@ -104,7 +104,7 @@ def get_duration(df):
                 right += 1
         return (min(left/total, right/total), median, "duration")
 
-def get_topics(df):
+def get_listed_in(df):
     if df["listed_in"].isnull().all():
         return None
     total = len(df["listed_in"]) 
@@ -156,18 +156,6 @@ def preprocess(df):
     df["rating"] = df["rating"].apply( mergeRating )
     return df
 
-def question_asked(question, response_json):
-    for object in response_json["questions"]:
-        if question == object["column"]:
-            return True
-    return False
-
-def guess_asked(guess, response_json):
-    for object in response_json["guesses"]:
-        if guess == object:
-            return True
-    return False
-
 def keep_category(df, object):
     return df.loc[(df[object["column"]] == object["data"]) | (df[object["column"]].isnull())]
 
@@ -186,6 +174,14 @@ def keep_greater_than(df, object):
 def del_greater_than(df, object):
     return df[ (df[object["column"]] <= object["data"]) | (df[object["column"]].isnull()) ]
 
+def guess_asked(guess, response_json):
+    return guess in response_json["guesses"]
+
+def question_asked(question_data, question_column, response_json):
+    for object in response_json["questions"]:
+        if question_column == object["column"] and question_data == object["data"]:
+            return True
+    return False
 
 @app.route('/', methods=['POST'])
 @cross_origin()
@@ -214,42 +210,44 @@ def hello_world():
                 df = keep_greater_than(df, object)
             elif object["answer"] == "no":
                 df = del_greater_than(df, object)
-
     df = df.reset_index(drop=True)
 
+    # no more valid items
     if len(df) == 0:
         response_json["guesses"].append(None)
         return response_json
 
-    attributes = [get_release_year(df), get_country(df), get_type(df)]
-    attributes.sort(reverse=True)
+    #get questions
+    questions_list = [i for i in [get_release_year(df), get_country(df), get_type(df), get_cast(df), get_director(df), get_listed_in(df), get_rating(df), get_duration(df)] if i is not None]
+    questions_list.sort(reverse=True)
     
-    guess = False
+    guess = True # Stop Asking, start Guessing
+    for question in questions_list:
+        if (question_asked(question[1], question[2], response_json)):
+            continue
 
-    it = 0
-    while question_asked(attributes[it][2], response_json):
-        it += 1
-
-        if it == len(attributes):
-            guess = True
-            break
-    
-    if guess:
-        it = 0
-        while guess_asked(df['title'].iloc[it], response_json):
-            it += 1
-
-            if it == len(df):
-                response_json["guesses"].append(None)
-                return response_json
-      
-        response_json["guesses"].append(df['title'].iloc[it])
-    else:
         response_json["questions"].append({
-            "column": str(attributes[it][2]),
-            "data": str(attributes[it][1]),
+            "column": str(question[2]),
+            "data": str(question[1]),
             "answer": None
         })
+
+        guess = False
+
+        break
+
+    if guess:
+        no_more_guesses = True
+        for guess in df['title']:
+            if guess_asked(guess, response_json):
+                continue
+            
+            no_more_guesses = False
+            response_json["guesses"].append(guess)
+            break
+
+        if (no_more_guesses):
+            response_json["guesses"].append(None)
 
     return response_json
 
