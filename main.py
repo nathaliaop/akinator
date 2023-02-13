@@ -123,18 +123,23 @@ def get_listed_in(df):
 def preprocess(df):
     if "date_added" in df:
         del df["date_added"]
+    
     if "show_id" in df:
         del df["show_id"]
+    
     def str2list(i):
-        if i.isinstance(str):
+        if isinstance(i, str):
             return [j.strip() for j in i.split(',')]
         return [] # nan values
+    
     def str2int(i):
         return int((i.split())[0])
+    
     df["listed_in"] = df["listed_in"].apply( str2list )
     df["director"] = df["director"].apply( str2list )
     df["cast"] = df["cast"].apply( str2list )
     df["duration"] = df["duration"].apply( str2int )
+  
     def mergeRating(i):
         if i in ["G", "ALL", "ALL_AGES", "TV-Y", "TV-G"]:
             return 0
@@ -153,7 +158,9 @@ def preprocess(df):
         elif i in ["NR", 'TV-NR', 'UNRATED', 'NOT_RATE', "PG", "TV-PG"]:
             return np.nan
         return i
+    
     df["rating"] = df["rating"].apply( mergeRating )
+    
     return df
 
 def keep_category(df, object):
@@ -169,10 +176,10 @@ def del_category_list(df, object):
     return df[df[object["column"]].apply(lambda x: object["data"] not in x)]
 
 def keep_greater_than(df, object):
-    return df[ (df[object["column"]] > object["data"]) | (df[object["column"]].isnull()) ]
+    return df[ (df[object["column"]] > int(object["data"])) | (df[object["column"]].isnull()) ]
 
 def del_greater_than(df, object):
-    return df[ (df[object["column"]] <= object["data"]) | (df[object["column"]].isnull()) ]
+    return df[ (df[object["column"]] <= int(object["data"])) | (df[object["column"]].isnull()) ]
 
 def guess_asked(guess, response_json):
     return guess in response_json["guesses"]
@@ -181,11 +188,12 @@ def question_asked(question_data, question_column, response_json):
     for object in response_json["questions"]:
         if question_column == object["column"] and question_data == object["data"]:
             return True
+    
     return False
 
 @app.route('/', methods=['POST'])
 @cross_origin()
-def hello_world():
+def get_game_state():
     response_json = request.get_json()
 
     df = pd.read_csv("datasets/amazon_prime_titles.csv")
@@ -219,13 +227,13 @@ def hello_world():
 
     #get questions
     questions_list = [i for i in [get_release_year(df), get_country(df), get_type(df), get_cast(df), get_director(df), get_listed_in(df), get_rating(df), get_duration(df)] if i is not None]
-    questions_list.sort(reverse=True)
+    questions_list.sort(reverse=True, key = lambda x: x[0])
     
     guess = True # Stop Asking, start Guessing
     for question in questions_list:
-        if (question_asked(question[1], question[2], response_json)):
+        if question_asked(str(question[1]), str(question[2]), response_json):
             continue
-
+        
         response_json["questions"].append({
             "column": str(question[2]),
             "data": str(question[1]),
