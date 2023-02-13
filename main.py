@@ -259,5 +259,47 @@ def get_game_state():
 
     return response_json
 
+@app.route('/add_line', methods=['POST'])
+@cross_origin()
+def add_movie():
+  response_json = request.get_json()
+
+  df = pd.read_csv("datasets/amazon_prime_titles.csv")
+
+  new_row = {}
+
+  if 'type' in response_json:
+    new_row['type'] = response_json["type"]
+  
+  if 'director' in response_json:
+    new_row['director'] = response_json["director"]
+  
+  if 'cast' in response_json:
+    new_row['cast'] = response_json["cast"]
+
+  if 'country' in response_json:
+    new_row['country'] = response_json["country"]
+
+  if 'release_year' in response_json:
+    new_row['release_year'] = response_json["release_year"]
+
+  if 'duration' in response_json:
+    new_row['duration'] = response_json["duration"]
+
+  if 'rating' in response_json:
+    new_row['rating'] = response_json["rating"]
+
+  if 'listed_in' in response_json:
+    new_row['listed_in'] = response_json["listed_in"]
+
+  if 'title' in response_json:
+    new_row['title'] = response_json["title"]
+
+  df = df.append(new_row, ignore_index=True)
+
+  df.to_csv("datasets/amazon_prime_titles.csv", index=False)
+
+  return new_row
+
 if __name__ == '__main__':
       app.run(host='0.0.0.0', port=os.environ.get('PORT'))
