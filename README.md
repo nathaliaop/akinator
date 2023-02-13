@@ -27,6 +27,9 @@ env/scripts/activate
 # linux - ativar o ambiente virtual
 source env/bin/activate
 
+# desativar ambiente virtual caso necessário
+deactivate
+
 # instalar dependências
 pip install -r requirements.txt
 ```
