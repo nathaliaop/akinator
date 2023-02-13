@@ -231,6 +231,7 @@ def get_game_state():
     # no more valid items
     if len(df) == 0:
         response_json["guesses"].append(None)
+        response_json["remain"] = 0
         return response_json
 
     #get questions
@@ -244,7 +245,7 @@ def get_game_state():
         
         if (question[0] < 0.01):
             break
-        
+
         response_json["questions"].append({
             "column": str(question[2]),
             "data": str(question[1]),
@@ -268,6 +269,8 @@ def get_game_state():
         if (no_more_guesses):
             response_json["guesses"].append(None)
 
+    response_json["remain"] = len(df)
+    
     return response_json
 
 @app.route('/add_line', methods=['POST'])
