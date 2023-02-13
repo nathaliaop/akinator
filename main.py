@@ -242,6 +242,9 @@ def get_game_state():
         if question_asked(str(question[1]), str(question[2]), response_json):
             continue
         
+        if (question[0] < 0.01):
+            break
+
         response_json["questions"].append({
             "column": str(question[2]),
             "data": str(question[1]),
