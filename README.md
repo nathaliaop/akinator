@@ -24,7 +24,7 @@ flask --app main --debug run
 
 Url de desenvolvimento: `http://localhost:5000`
 
-Url de produção: `https://akinator-five.vercel.app`
+Url de produção: `https://akinator.up.railway.app`
 
 Rota: `/`
 
@@ -56,7 +56,7 @@ Resposta:
 ```
 
 
-Após fazer a pergunta, mandar a requisição novamente com a resposta
+O tipo é filme? Após fazer a pergunta, mandar a requisição novamente com a resposta. Respostas possível são `yes` para sim, `no` para não e `idk` para não sei.
 
 Requisição:
 ```json
@@ -76,15 +76,74 @@ Requisição:
 Resposta:
 ```json
 {
-  "questions": [
+  "questions" : [
     {
       "answer": "yes",
       "column": "type",
       "data": "Movie"
+    },
+    {
+      "answer": null,
+      "column": "release_year",
+      "data": "2021"
     }
   ],
   "guesses": [
-     "The Grand Seduction"
+  ]
+}
+```
+
+Mandar as respostas anteriores junto a cada nova requisição. Quando houver informações o suficiente, a resposta será adicionada ao array guesses. Caso a reposta esteja incorreta, reenviar a requisição e uma nova resposta será adicionada ao array guesses. Se não houver mais respostas possíveis, null será adicionado ao array guesses.
+
+Requisição:
+```json
+{
+  "questions" : [
+    {
+      "answer": "yes",
+      "column": "type",
+      "data": "Movie"
+    },
+    {
+      "answer": "idk",
+      "column": "release_year",
+      "data": "2021"
+    },
+    {
+      "answer": "no",
+      "column": "country",
+      "data": "India"
+    }
+  ],
+  "guesses": [
+    "The Grand Seduction"
+  ]
+}
+```
+
+Resposta:
+```json
+{
+  "questions" : [
+    {
+      "answer": "yes",
+      "column": "type",
+      "data": "Movie"
+    },
+    {
+      "answer": "idk",
+      "column": "release_year",
+      "data": "2021"
+    },
+    {
+      "answer": "no",
+      "column": "country",
+      "data": "India"
+    }
+  ],
+  "guesses": [
+    "The Grand Seduction",
+    null
   ]
 }
 ```
