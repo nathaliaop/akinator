@@ -133,7 +133,15 @@ def preprocess(df):
         return [] # nan values
     
     def str2int(i):
-        return int((i.split())[0])
+        try:
+          ans = int((i.split())[0])
+        except:
+          try:
+            ans = int(i)
+          except:
+            ans = np.nan
+        
+        return ans
     
     df["listed_in"] = df["listed_in"].apply( str2list )
     df["director"] = df["director"].apply( str2list )
