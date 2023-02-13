@@ -10,6 +10,12 @@ git clone https://github.com/nathaliaop/akinator.git
 cd akinator
 ```
 
+# Adicionar variáveis de ambiente
+Adicionar uma arquivo chamado .env com o seguinte conteúdo
+```
+PORT=5000
+```
+
 ## Criar ambiente virtual e instalar dependências:
 ```
 # criar o ambiente virtual 
